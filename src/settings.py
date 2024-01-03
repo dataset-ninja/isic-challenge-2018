@@ -53,18 +53,29 @@ CLASS2COLOR: Optional[Dict[str, List[str]]] = None
 
 # If you have more than the one paper, put the most relatable link as the first element of the list
 # Use dict key to specify name for a button
-PAPER: Optional[Union[str, List[str], Dict[str, str]]] = None
+PAPER: Optional[Union[str, List[str], Dict[str, str]]] = "https://arxiv.org/abs/1902.03368"
 BLOGPOST: Optional[Union[str, List[str], Dict[str, str]]] = None
 REPOSITORY: Optional[Union[str, List[str], Dict[str, str]]] = None
 
-CITATION_URL: Optional[str] = None
-AUTHORS: Optional[List[str]] = ["Harald Kittler, M.D.", "Noel C. F. Codella, Ph.D."]  # TODO
-AUTHORS_CONTACTS: Optional[List[str]] = None
+CITATION_URL: Optional[str] = None  # TODO
+AUTHORS: Optional[List[str]] = [
+    "Noel Codella",
+    "Veronica Rotemberg",
+    "Philipp Tschandl",
+    "M. Emre Celebi",
+    "Stephen Dusza",
+    "David Gutman",
+    "Brian Helba",
+    "Aadi Kalloo",
+    "Konstantinos Liopyris",
+    "Michael Marchetti",
+    "Harald Kittler",
+    "Allan Halpern",
+]
+AUTHORS_CONTACTS: Optional[List[str]] = ["ncodella@microsoft.com", "rotembev@mskcc.org"]
 
-ORGANIZATION_NAME: Optional[Union[str, List[str]]] = "The International Skin Imaging Collaboration"
-ORGANIZATION_URL: Optional[
-    Union[str, List[str]]
-] = "https://www.isic-archive.com/?_gl=1*na9hi3*_ga*MTI4NDY5MTU1Ni4xNjk5NTMyMDkx*_ga_CH3R8SVJ79*MTcwNDIwNzM4NS44LjEuMTcwNDIwOTE4NS4wLjAuMA.."
+ORGANIZATION_NAME: Optional[Union[str, List[str]]] = "US-AT joint research group"
+ORGANIZATION_URL: Optional[Union[str, List[str]]] = None
 
 # Set '__PRETEXT__' or '__POSTTEXT__' as a key with string value to add custom text. e.g. SLYTAGSPLIT = {'__POSTTEXT__':'some text}
 SLYTAGSPLIT: Optional[Dict[str, Union[List[str], str]]] = None
