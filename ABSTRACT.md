@@ -7,7 +7,7 @@ The authors of the dataset emphasize that skin cancer, being the most prevalent 
 The study, sponsored by the International Dermatoscopy Society (IDS), provided human diagnostic accuracy data for hundreds of images. Clinician participants numbering in the hundreds from around the world contributed to **ISIC Challenge 2018** dataset. This comprehensive dataset provided the basis for comparing the diagnostic performance of machine learning algorithms with clinical experts of different levels of expertise. The ISIC 2018 task included several independent subtasks:
 
 1. Predict lesion segmentation masks from dermoscopic images.
-   <img src="" alt="image" width="800">
+   <img src="https://github.com/dataset-ninja/isic-challenge-2018/assets/120389559/0a9bff8a-43b2-4fa6-baf6-3cc348f4b552" alt="image" width="800">
 
 2. Classify and localize clinical dermoscopic attribute patterns as binary masks. Categories include _network_, _negative network_, _pigment network_, _streaks_, _milia-like cysts_ and _globules_.
-   <img src="" alt="image" width="800">
+   <img src="https://github.com/dataset-ninja/isic-challenge-2018/assets/120389559/9b867ef9-95ad-4a06-9111-9ed8ef72a502" alt="image" width="800">
