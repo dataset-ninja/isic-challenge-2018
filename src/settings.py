@@ -54,8 +54,8 @@ CLASS2COLOR: Optional[Dict[str, List[str]]] = None
 # If you have more than the one paper, put the most relatable link as the first element of the list
 # Use dict key to specify name for a button
 PAPER: Optional[Union[str, List[str], Dict[str, str]]] = {
-    "HAM10000 Dataset": "https://doi.org/10.1038/sdata.2018.161",
-    "MSK Dataset": "https://arxiv.org/abs/1902.03368",
+    "HAM10000 Dataset Paper": "https://doi.org/10.1038/sdata.2018.161",
+    "MSK Dataset Paper": "https://arxiv.org/pdf/1902.03368.pdf",
 }
 BLOGPOST: Optional[Union[str, List[str], Dict[str, str]]] = None
 REPOSITORY: Optional[Union[str, List[str], Dict[str, str]]] = None
