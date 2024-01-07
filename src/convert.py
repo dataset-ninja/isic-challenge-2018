@@ -1,3 +1,4 @@
+import csv
 import os
 import shutil
 from urllib.parse import unquote, urlparse
@@ -5,7 +6,12 @@ from urllib.parse import unquote, urlparse
 import supervisely as sly
 from cv2 import connectedComponents
 from dataset_tools.convert import unpack_if_archive
-from supervisely.io.fs import get_file_ext, get_file_name
+from supervisely.io.fs import (
+    file_exists,
+    get_file_ext,
+    get_file_name,
+    get_file_name_with_ext,
+)
 from tqdm import tqdm
 
 import src.settings as s
@@ -105,45 +111,114 @@ def convert_and_upload_supervisely_project(
         "_attribute_pigment_network.png",
         "_attribute_streaks.png",
     ]
-    mask_file_ext = ".png"
+
+    train3_images_path = "/home/alex/DATASETS/TODO/ISIC Challenge3/ISIC2018_Task3_Training_Input"
+    train3_anns_path = "/home/alex/DATASETS/TODO/ISIC Challenge3/ISIC2018_Task3_Training_GroundTruth/ISIC2018_Task3_Training_GroundTruth.csv"
+    val3_images_path = "/home/alex/DATASETS/TODO/ISIC Challenge3/ISIC2018_Task3_Validation_Input"
+    val3_anns_path = "/home/alex/DATASETS/TODO/ISIC Challenge3/ISIC2018_Task3_Validation_GroundTruth/ISIC2018_Task3_Validation_GroundTruth.csv"
+    test3_images_path = "/home/alex/DATASETS/TODO/ISIC Challenge3/ISIC2018_Task3_Test_Input"
+    test3_anns_path = "/home/alex/DATASETS/TODO/ISIC Challenge3/ISIC2018_Task3_Test_GroundTruth/ISIC2018_Task3_Test_GroundTruth.csv"
+
+    train3_diagnosis_path = (
+        "/home/alex/DATASETS/TODO/ISIC Challenge3/ISIC2018_Task3_Training_LesionGroupings.csv"
+    )
+
+    # ds_name_to_data = {
+    #     "val": (
+    #         val_images_path,
+    #         val_masks1_path,
+    #         val_masks2_path,
+    #         val3_images_path,
+    #         val3_anns_path,
+    #     ),
+    #     "train": (
+    #         train_images_path,
+    #         train_masks1_path,
+    #         train_masks2_path,
+    #         train3_images_path,
+    #         train3_anns_path,
+    #     ),
+    #     "test": (
+    #         test_images_path,
+    #         test_masks1_path,
+    #         test_masks2_path,
+    #         test3_images_path,
+    #         test3_anns_path,
+    #     ),
+    # }
 
     ds_name_to_data = {
-        "val": (val_images_path, val_masks1_path, val_masks2_path),
-        "train": (train_images_path, train_masks1_path, train_masks2_path),
-        "test": (test_images_path, test_masks1_path, test_masks2_path),
+        "train": (
+            train_images_path,
+            train_masks1_path,
+            train_masks2_path,
+            train3_images_path,
+            train3_anns_path,
+        )
     }
 
     def create_ann(image_path):
         labels = []
+        tags = []
 
         image_name = get_file_name(image_path)
 
-        mask1_path = os.path.join(masks1_path, image_name + masks1_ext)
-        ann_np = sly.imaging.image.read(mask1_path)[:, :, 0]
-        img_height = ann_np.shape[0]
-        img_wight = ann_np.shape[1]
-        mask = ann_np == 255
-        ret, curr_mask = connectedComponents(mask.astype("uint8"), connectivity=8)
-        for i in range(1, ret):
-            obj_mask = curr_mask == i
-            curr_bitmap = sly.Bitmap(obj_mask)
-            curr_label = sly.Label(curr_bitmap, cancer)
-            labels.append(curr_label)
+        if get_file_name_with_ext(image_path) in images3_names:
+            task3 = sly.Tag(task3_meta)
+            tags.append(task3)
 
-        for idx, masks2_ext in enumerate(masks2_exts):
-            obj_class = idx_to_class[idx]
-            mask2_path = os.path.join(masks2_path, image_name + masks2_ext)
-            ann_np = sly.imaging.image.read(mask2_path)[:, :, 0]
+        if ds_name == "train":
+            diagnos_data = im3_train_name_to_diagnos.get(image_name)
+            if diagnos_data is not None:
+                lesion_id_value = diagnos_data[0]
+                lesion_id = sly.Tag(lesion_id_meta, value=lesion_id_value)
+                tags.append(lesion_id)
+                diagnosis_name = diagnos_data[1]
+                diagnosis_meta = meta.get_tag_meta(diagnosis_name)
+                if diagnosis_meta is not None:
+                    diagnosis = sly.Tag(diagnosis_meta)
+                    tags.append(diagnosis)
+
+        tag_index = im3_name_to_ann.get(image_name)
+        if tag_index is not None:
+            tag_meta = name_to_tag_meta[tag_index]
+            tag = sly.Tag(tag_meta)
+            tags.append(tag)
+
+        mask1_path = os.path.join(masks1_path, image_name + masks1_ext)
+        if file_exists(mask1_path):
+            task1 = sly.Tag(task1_meta)
+            ann_np = sly.imaging.image.read(mask1_path)[:, :, 0]
+            img_height = ann_np.shape[0]
+            img_wight = ann_np.shape[1]
             mask = ann_np == 255
             ret, curr_mask = connectedComponents(mask.astype("uint8"), connectivity=8)
             for i in range(1, ret):
                 obj_mask = curr_mask == i
                 curr_bitmap = sly.Bitmap(obj_mask)
-                if curr_bitmap.area > 30:
-                    curr_label = sly.Label(curr_bitmap, obj_class)
-                    labels.append(curr_label)
+                curr_label = sly.Label(curr_bitmap, cancer, tags=[task1])
+                labels.append(curr_label)
 
-        return sly.Annotation(img_size=(img_height, img_wight), labels=labels)
+            for idx, masks2_ext in enumerate(masks2_exts):
+                task2 = sly.Tag(task2_meta)
+                obj_class = idx_to_class[idx]
+                mask2_path = os.path.join(masks2_path, image_name + masks2_ext)
+                ann_np = sly.imaging.image.read(mask2_path)[:, :, 0]
+                mask = ann_np == 255
+                ret, curr_mask = connectedComponents(mask.astype("uint8"), connectivity=8)
+                for i in range(1, ret):
+                    obj_mask = curr_mask == i
+                    curr_bitmap = sly.Bitmap(obj_mask)
+                    if curr_bitmap.area > 30:
+                        curr_label = sly.Label(curr_bitmap, obj_class, tags=[task2])
+                        labels.append(curr_label)
+
+        else:
+            ann_np = sly.imaging.image.read(image_path)[:, :, 0]
+            img_height = ann_np.shape[0]
+            img_wight = ann_np.shape[1]
+
+        return sly.Annotation(img_size=(img_height, img_wight), labels=labels, img_tags=tags)
 
     cancer = sly.ObjClass("skin cancer", sly.Bitmap, color=(230, 25, 75))
     globule = sly.ObjClass("globule", sly.Bitmap, color=(60, 180, 75))
@@ -151,6 +226,36 @@ def convert_and_upload_supervisely_project(
     negative_network = sly.ObjClass("negative network", sly.Bitmap, color=(0, 130, 200))
     pigment_network = sly.ObjClass("pigment network", sly.Bitmap, color=(245, 130, 48))
     streaks = sly.ObjClass("streaks", sly.Bitmap, color=(145, 30, 180))
+
+    task1_meta = sly.TagMeta("task 1", sly.TagValueType.NONE)
+    task2_meta = sly.TagMeta("task 2", sly.TagValueType.NONE)
+    task3_meta = sly.TagMeta("task 3", sly.TagValueType.NONE)
+
+    serial_meta = sly.TagMeta("serial imaging showing no change", sly.TagValueType.NONE)
+    histopathology_meta = sly.TagMeta("histopathology", sly.TagValueType.NONE)
+    single_meta = sly.TagMeta("single image expert consensus", sly.TagValueType.NONE)
+    confocal_meta = sly.TagMeta(
+        "confocal microscopy with consensus dermoscopy", sly.TagValueType.NONE
+    )
+    lesion_id_meta = sly.TagMeta("lesion id", sly.TagValueType.ANY_STRING)
+
+    actinic = sly.TagMeta("actinic keratoses", sly.TagValueType.NONE)
+    basal = sly.TagMeta("basal cell carcinoma", sly.TagValueType.NONE)
+    benign = sly.TagMeta("benign keratosis-like lesions", sly.TagValueType.NONE)
+    dermatofibroma = sly.TagMeta("dermatofibroma", sly.TagValueType.NONE)
+    melanoma = sly.TagMeta("melanoma", sly.TagValueType.NONE)
+    melanocytic = sly.TagMeta("melanocytic nevi", sly.TagValueType.NONE)
+    vascular = sly.TagMeta("vascular lesions", sly.TagValueType.NONE)
+
+    name_to_tag_meta = {
+        "AKIEC": actinic,
+        "BCC": basal,
+        "BKL": benign,
+        "DF": dermatofibroma,
+        "MEL": melanoma,
+        "NV": melanocytic,
+        "VASC": vascular,
+    }
 
     idx_to_class = {
         0: globule,
@@ -160,27 +265,83 @@ def convert_and_upload_supervisely_project(
         4: streaks,
     }
 
+    index_to_tag_name = {1: "MEL", 2: "NV", 3: "BCC", 4: "AKIEC", 5: "BKL", 6: "DF", 7: "VASC"}
+
     project = api.project.create(workspace_id, project_name, change_name_if_conflict=True)
     meta = sly.ProjectMeta(
-        obj_classes=[cancer, globule, milia_like_cyst, negative_network, pigment_network, streaks]
+        obj_classes=[
+            cancer,
+            globule,
+            milia_like_cyst,
+            negative_network,
+            pigment_network,
+            streaks,
+        ],
+        tag_metas=[
+            task1_meta,
+            task2_meta,
+            task3_meta,
+            serial_meta,
+            histopathology_meta,
+            single_meta,
+            confocal_meta,
+            actinic,
+            basal,
+            benign,
+            dermatofibroma,
+            melanoma,
+            melanocytic,
+            vascular,
+            lesion_id_meta,
+        ],
     )
     api.project.update_meta(project.id, meta.to_json())
+
+    im3_train_name_to_diagnos = {}
+
+    with open(train3_diagnosis_path, "r") as file:
+        csvreader = csv.reader(file)
+        for idx, row in enumerate(csvreader):
+            if idx == 0:
+                continue
+            im3_train_name_to_diagnos[row[0]] = row[1:]
 
     for ds_name, ds_data in ds_name_to_data.items():
         dataset = api.dataset.create(project.id, ds_name, change_name_if_conflict=True)
 
-        images_path, masks1_path, masks2_path = ds_data
+        images_path, masks1_path, masks2_path, images3_path, anns3_path = ds_data
 
-        images_names = [
+        im3_name_to_ann = {}
+
+        with open(anns3_path, "r") as file:
+            csvreader = csv.reader(file)
+            for idx, row in enumerate(csvreader):
+                if idx == 0:
+                    continue
+                class_index = row.index("1.0")
+                im3_name_to_ann[row[0]] = index_to_tag_name[class_index]
+
+        images_names1_2 = [
             im_name for im_name in os.listdir(images_path) if get_file_ext(im_name) == images_ext
         ]
+
+        images3_names = [
+            im_name for im_name in os.listdir(images3_path) if get_file_ext(im_name) == images_ext
+        ]
+
+        images_names = list(set(images_names1_2 + images3_names))
 
         progress = sly.Progress("Create dataset {}".format(ds_name), len(images_names))
 
         for img_names_batch in sly.batched(images_names, batch_size=batch_size):
-            images_pathes_batch = [
-                os.path.join(images_path, image_path) for image_path in img_names_batch
-            ]
+            images_pathes_batch = []
+            for image_name in img_names_batch:
+                im_path = os.path.join(images_path, image_name)
+                if file_exists(im_path):
+                    images_pathes_batch.append(im_path)
+                else:
+                    im_path = os.path.join(images3_path, image_name)
+                    images_pathes_batch.append(im_path)
 
             img_infos = api.image.upload_paths(dataset.id, img_names_batch, images_pathes_batch)
             img_ids = [im_info.id for im_info in img_infos]
