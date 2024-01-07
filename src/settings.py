@@ -14,7 +14,9 @@ from dataset_tools.templates import (
 # * Before uploading to instance #
 ##################################
 PROJECT_NAME: str = "ISIC Challenge 2018"
-PROJECT_NAME_FULL: str = "International Skin Imaging Collaboration Challenge 2018"
+PROJECT_NAME_FULL: str = (
+    "ISIC Challenge 2018: International Skin Imaging Collaboration Challenge 2018"
+)
 HIDE_DATASET = True  # set False when 100% sure about repo quality
 
 ##################################
@@ -43,9 +45,7 @@ GITHUB_URL: str = "https://github.com/dataset-ninja/isic-challenge-2018"
 ##################################
 ### * Optional after uploading ###
 ##################################
-DOWNLOAD_ORIGINAL_URL: Optional[
-    Union[str, dict]
-] = "https://challenge.isic-archive.com/data/#2018"  # TODO
+DOWNLOAD_ORIGINAL_URL: Optional[Union[str, dict]] = "https://challenge.isic-archive.com/data/#2018"
 # Optional link for downloading original dataset (e.g. "https://some.com/dataset/download")
 
 CLASS2COLOR: Optional[Dict[str, List[str]]] = None
@@ -53,11 +53,14 @@ CLASS2COLOR: Optional[Dict[str, List[str]]] = None
 
 # If you have more than the one paper, put the most relatable link as the first element of the list
 # Use dict key to specify name for a button
-PAPER: Optional[Union[str, List[str], Dict[str, str]]] = "https://arxiv.org/abs/1902.03368"
+PAPER: Optional[Union[str, List[str], Dict[str, str]]] = {
+    "HAM10000 Dataset": "https://doi.org/10.1038/sdata.2018.161",
+    "MSK Dataset": "https://arxiv.org/abs/1902.03368",
+}
 BLOGPOST: Optional[Union[str, List[str], Dict[str, str]]] = None
 REPOSITORY: Optional[Union[str, List[str], Dict[str, str]]] = None
 
-CITATION_URL: Optional[str] = None  # TODO
+CITATION_URL: Optional[str] = "https://challenge.isic-archive.com/data/#2018"
 AUTHORS: Optional[List[str]] = [
     "Noel Codella",
     "Veronica Rotemberg",

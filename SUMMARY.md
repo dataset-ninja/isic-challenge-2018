@@ -1,4 +1,4 @@
-**International Skin Imaging Collaboration Challenge 2018** is a dataset for a semantic segmentation task. It is used in the medical research. 
+**ISIC Challenge 2018: International Skin Imaging Collaboration Challenge 2018** is a dataset for a semantic segmentation task. It is used in the medical research. 
 
 The dataset consists of 3694 images with 18055 labeled objects belonging to 6 different classes including *skin cancer*, *pigment network*, *globule*, and other: *milia like cyst*, *negative network*, and *streaks*.
 
