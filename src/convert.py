@@ -123,38 +123,28 @@ def convert_and_upload_supervisely_project(
         "/home/alex/DATASETS/TODO/ISIC Challenge3/ISIC2018_Task3_Training_LesionGroupings.csv"
     )
 
-    # ds_name_to_data = {
-    #     "val": (
-    #         val_images_path,
-    #         val_masks1_path,
-    #         val_masks2_path,
-    #         val3_images_path,
-    #         val3_anns_path,
-    #     ),
-    #     "train": (
-    #         train_images_path,
-    #         train_masks1_path,
-    #         train_masks2_path,
-    #         train3_images_path,
-    #         train3_anns_path,
-    #     ),
-    #     "test": (
-    #         test_images_path,
-    #         test_masks1_path,
-    #         test_masks2_path,
-    #         test3_images_path,
-    #         test3_anns_path,
-    #     ),
-    # }
-
     ds_name_to_data = {
+        "val": (
+            val_images_path,
+            val_masks1_path,
+            val_masks2_path,
+            val3_images_path,
+            val3_anns_path,
+        ),
         "train": (
             train_images_path,
             train_masks1_path,
             train_masks2_path,
             train3_images_path,
             train3_anns_path,
-        )
+        ),
+        "test": (
+            test_images_path,
+            test_masks1_path,
+            test_masks2_path,
+            test3_images_path,
+            test3_anns_path,
+        ),
     }
 
     def create_ann(image_path):
@@ -188,6 +178,8 @@ def convert_and_upload_supervisely_project(
         mask1_path = os.path.join(masks1_path, image_name + masks1_ext)
         if file_exists(mask1_path):
             task1 = sly.Tag(task1_meta)
+            tags.append(task1)
+            task = sly.Tag(task_meta, value=1)
             ann_np = sly.imaging.image.read(mask1_path)[:, :, 0]
             img_height = ann_np.shape[0]
             img_wight = ann_np.shape[1]
@@ -196,11 +188,13 @@ def convert_and_upload_supervisely_project(
             for i in range(1, ret):
                 obj_mask = curr_mask == i
                 curr_bitmap = sly.Bitmap(obj_mask)
-                curr_label = sly.Label(curr_bitmap, cancer, tags=[task1])
+                curr_label = sly.Label(curr_bitmap, cancer, tags=[task])
                 labels.append(curr_label)
 
+            task2 = sly.Tag(task2_meta)
+            tags.append(task2)
             for idx, masks2_ext in enumerate(masks2_exts):
-                task2 = sly.Tag(task2_meta)
+                task = sly.Tag(task_meta, value=2)
                 obj_class = idx_to_class[idx]
                 mask2_path = os.path.join(masks2_path, image_name + masks2_ext)
                 ann_np = sly.imaging.image.read(mask2_path)[:, :, 0]
@@ -210,7 +204,7 @@ def convert_and_upload_supervisely_project(
                     obj_mask = curr_mask == i
                     curr_bitmap = sly.Bitmap(obj_mask)
                     if curr_bitmap.area > 30:
-                        curr_label = sly.Label(curr_bitmap, obj_class, tags=[task2])
+                        curr_label = sly.Label(curr_bitmap, obj_class, tags=[task])
                         labels.append(curr_label)
 
         else:
@@ -227,9 +221,10 @@ def convert_and_upload_supervisely_project(
     pigment_network = sly.ObjClass("pigment network", sly.Bitmap, color=(245, 130, 48))
     streaks = sly.ObjClass("streaks", sly.Bitmap, color=(145, 30, 180))
 
-    task1_meta = sly.TagMeta("task 1", sly.TagValueType.NONE)
-    task2_meta = sly.TagMeta("task 2", sly.TagValueType.NONE)
-    task3_meta = sly.TagMeta("task 3", sly.TagValueType.NONE)
+    task1_meta = sly.TagMeta("task 1: lesion segmentation", sly.TagValueType.NONE)
+    task2_meta = sly.TagMeta("task 2: attribution detection", sly.TagValueType.NONE)
+    task3_meta = sly.TagMeta("task 3: disease classification", sly.TagValueType.NONE)
+    task_meta = sly.TagMeta("task", sly.TagValueType.ANY_NUMBER)
 
     serial_meta = sly.TagMeta("serial imaging showing no change", sly.TagValueType.NONE)
     histopathology_meta = sly.TagMeta("histopathology", sly.TagValueType.NONE)
@@ -293,6 +288,7 @@ def convert_and_upload_supervisely_project(
             melanocytic,
             vascular,
             lesion_id_meta,
+            task_meta,
         ],
     )
     api.project.update_meta(project.id, meta.to_json())

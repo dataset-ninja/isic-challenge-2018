@@ -22,7 +22,7 @@ HIDE_DATASET = True  # set False when 100% sure about repo quality
 ##################################
 # * After uploading to instance ##
 ##################################
-LICENSE: License = License.CC_BY_NC_4_0()  # TODO
+LICENSE: License = License.CC_BY_NC_4_0()
 APPLICATIONS: List[Union[Industry, Domain, Research]] = [Research.Medical()]
 CATEGORY: Category = Category.Medical()
 
@@ -36,7 +36,7 @@ if RELEASE_DATE is None:
 HOMEPAGE_URL: str = "https://challenge.isic-archive.com/data/#2018"
 # e.g. "https://some.com/dataset/homepage"
 
-PREVIEW_IMAGE_ID: int = 12492222
+PREVIEW_IMAGE_ID: int = 12507315
 # This should be filled AFTER uploading images to instance, just ID of any image.
 
 GITHUB_URL: str = "https://github.com/dataset-ninja/isic-challenge-2018"
@@ -82,7 +82,7 @@ ORGANIZATION_URL: Optional[Union[str, List[str]]] = None
 
 # Set '__PRETEXT__' or '__POSTTEXT__' as a key with string value to add custom text. e.g. SLYTAGSPLIT = {'__POSTTEXT__':'some text}
 SLYTAGSPLIT: Optional[Dict[str, Union[List[str], str]]] = {
-    "__PRETEXT__": "Additionally, labels with ***lesion segmentation*** are marked with ***task 1*** tag, labels with ***attribute detection*** are marked with ***task 2*** tag and images with ***disease classification*** are marked with ***task 3*** tag.***"
+    "__PRETEXT__": "Additionally, images with ***lesion segmentation*** are marked with ***task 1: lesion segmentation*** tag, images with ***attribute detection*** are marked with ***task 2: attribute detection*** tag and images with ***disease classification*** are marked with ***task 3: disease classification*** tag. Labels with ***lesion segmentation*** and ***attribute detection*** are marked by ***task*** tag with ***1*** or ***2*** values respectively"
 }
 TAGS: Optional[List[str]] = None
 
