@@ -17,7 +17,7 @@ PROJECT_NAME: str = "ISIC Challenge 2018"
 PROJECT_NAME_FULL: str = (
     "ISIC Challenge 2018: International Skin Imaging Collaboration Challenge 2018"
 )
-HIDE_DATASET = True  # set False when 100% sure about repo quality
+HIDE_DATASET = False  # set False when 100% sure about repo quality
 
 ##################################
 # * After uploading to instance ##
