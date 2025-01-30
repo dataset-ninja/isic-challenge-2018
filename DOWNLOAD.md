@@ -1,6 +1,6 @@
 Dataset **ISIC Challenge 2018** can be downloaded in [Supervisely format](https://developer.supervisely.com/api-references/supervisely-annotation-json-format):
 
- [Download](https://www.dropbox.com/scl/fi/p9ew313kcxgc9qdkn5b5h/isic-challenge-2018-DatasetNinja.tar?rlkey=qp2xbgjjde8i3e4ggh03qsjab&dl=1)
+ [Download](https://assets.supervisely.com/remote/eyJsaW5rIjogImZzOi8vYXNzZXRzLzMzMTJfSVNJQyBDaGFsbGVuZ2UgMjAxOC9pc2ljLWNoYWxsZW5nZS0yMDE4LURhdGFzZXROaW5qYS50YXIiLCAic2lnIjogIkt4SERCdklETFRKRjBNTFJDcUIzM0JQTlVrT25RdFhxT01JZEVSQlkvWE09In0=)
 
 As an alternative, it can be downloaded with *dataset-tools* package:
 ``` bash
